@@ -55,7 +55,9 @@ function runSearch() {
             type: "input",
             message: "How many units of the product would you like to buy? "
         })
-        .then(console.log("Great!\n\n"));
+        .then(function(answer) {
+            console.log("hello");
+        });
     })
     connection.end();
 }
