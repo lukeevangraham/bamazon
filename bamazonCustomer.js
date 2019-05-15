@@ -1,39 +1,46 @@
 var mysql = require("mysql");
 
 var connection = mysql.createConnection({
-  host: "localhost",
+    host: "localhost",
 
-  // Your port; if not 3306
-  port: 8889,
+    // Your port; if not 3306
+    port: 8889,
 
-  // Your username
-  user: "root",
+    // Your username
+    user: "root",
 
-  // Your password
-  password: "root",
-  database: "bamazon"
+    // Your password
+    password: "root",
+    database: "bamazon"
 });
 
-connection.connect(function(err) {
+connection.connect(function (err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId);
     afterConnection();
-  });
+});
 
 
-  function afterConnection() {
-    connection.query("SELECT * FROM bamazon.products", function(err,res) {
-      if (err) throw err;
-          console.log(res);
-          connection.end();
-      })
-    ;
-  }
+function afterConnection() {
+    connection.query("SELECT * FROM bamazon.products", function (err, res) {
+        if (err) throw err;
+
+        console.log(res)
+
+        //  FIRST DISPLAY ALL ITEMS AVAILABLE FOR SALE
+        //  INCLUDING ID'S NAMES AND PRICES
+        for (let i = 0; i < res.length; i++) {
+            console.log("ID: " + res[i].item_id + " ---- Product: " + res[i].product_name + " ---- Price: $" + res[i].price)
+            
+        }
+
+        connection.end();
+    })
+        ;
+}
 
 
 
-//  FIRST DISPLAY ALL ITEMS AVAILABLE FOR SALE
-//  INCLUDING ID'S NAMES AND PRICES
 
 //  THEN PROMPT USER WITH TWO MESSAGES
 
