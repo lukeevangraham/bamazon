@@ -42,26 +42,27 @@ function displayTable() {
 function runSearch() {
     //  ASK USER THE ID OF THE PRODUCT THEY WOULD LIKE TO BUY
     inquirer
-    .prompt({
-        name: "productDesired",
-        type: "input",
-        message: "Enter ID of product you want to buy: "
-    })
-    .then(function(productAnswer) {
-        //  ASK USER HOW MANY UNITS OF THE PRODUCT THEY WOULD LIKE TO BUY
-        inquirer
-        .prompt({
-            name: "quantityDesired",
-            type: "input",
-            message: "How many units of the product would you like to buy? "
-        })
-        .then(function(productAnswer, quantityAnswer) {
-            console.log(productAnswer.productDesired + quantityAnswer.quantityDesired);
+        .prompt([
+            {
+                type: "input",
+                message: "Enter ID of product you want to buy: ",
+                name: "productDesired"
+            },
+            {
+                type: "input",
+                message: "How many units of the product would you like to buy? ",
+                name: "quantityDesired"
+            }
+        ])
+        .then(function (answer) {
+            //  ASK USER HOW MANY UNITS OF THE PRODUCT THEY WOULD LIKE TO BUY
+
+
+            console.log(answer);
             // if (condition) {
-                
+
             // }
-        });
-    })
+        })
     connection.end();
 }
 
