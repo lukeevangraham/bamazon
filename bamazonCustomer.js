@@ -47,7 +47,7 @@ function runSearch() {
         type: "input",
         message: "Enter ID of product you want to buy: "
     })
-    .then(function(answer) {
+    .then(function(productAnswer) {
         //  ASK USER HOW MANY UNITS OF THE PRODUCT THEY WOULD LIKE TO BUY
         inquirer
         .prompt({
@@ -55,8 +55,11 @@ function runSearch() {
             type: "input",
             message: "How many units of the product would you like to buy? "
         })
-        .then(function(answer) {
-            console.log("hello");
+        .then(function(productAnswer, quantityAnswer) {
+            console.log(productAnswer.productDesired + quantityAnswer.quantityDesired);
+            // if (condition) {
+                
+            // }
         });
     })
     connection.end();
