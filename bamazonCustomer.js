@@ -46,8 +46,9 @@ function runSearch() {
             {
                 type: "input",
                 message: "Enter ID of product you want to buy: ",
-                name: "productDesired"
+                name: "idDesired"
             },
+            //  ASK USER HOW MANY UNITS OF THE PRODUCT THEY WOULD LIKE TO BUY
             {
                 type: "input",
                 message: "How many units of the product would you like to buy? ",
@@ -55,11 +56,21 @@ function runSearch() {
             }
         ])
         .then(function (answer) {
-            //  ASK USER HOW MANY UNITS OF THE PRODUCT THEY WOULD LIKE TO BUY
 
 
             console.log(answer);
-            // if (condition) {
+            var query = "SELECT stock_quantity FROM bamazon.products WHERE item_id = ?";
+
+
+            console.log("the query is" + query)
+            console.log(answer.idDesired);
+
+            connection.query(query, [answer.idDesired], function (err, res) {
+                console.log(res);
+            })
+
+            // console.log(quantityAvailable)
+            // if (answer.idDesired > ) {
 
             // }
         })
