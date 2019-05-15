@@ -59,23 +59,36 @@ function runSearch() {
 
 
             console.log(answer);
-            var query = "SELECT stock_quantity FROM bamazon.products WHERE item_id = ?";
+            // var query = "SELECT stock_quantity FROM bamazon.products WHERE item_id = ?";
+            var query = "SELECT stock_quantity FROM bamazon.products WHERE item_id = '" + answer.idDesired + "'";
 
 
-            console.log("the query is" + query)
+            // console.log("the query is" + query)
             console.log(answer.idDesired);
 
-            connection.query(query, [answer.idDesired], function (err, res) {
-                console.log(res);
-            })
+            // connection.query('SELECT * FROM bamazon.products WHERE item_id = "1"', function (err, results, fields) {
+            connection.query(query, {item_id: answer.idDesired}, function (err, results, fields) {
+
+                if (err) throw err;
+
+                console.log(results[0].stock_quantity)
+
+
+                if (results[0].stock_quantity >= answer.quantityDesired) {
+                    console.log("you can purchase that");
+                    connection.end();
+                } else {
+                    console.log("Insufficient quantity!");
+                    runSearch();
+                }
+              });
 
             // console.log(quantityAvailable)
             // if (answer.idDesired > ) {
 
             // }
         })
-    connection.end();
-}
+    }
 
 
 
