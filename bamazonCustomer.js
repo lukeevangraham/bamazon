@@ -25,7 +25,7 @@ function afterConnection() {
     connection.query("SELECT * FROM bamazon.products", function (err, res) {
         if (err) throw err;
 
-        console.log(res)
+        // console.log(res)
 
         //  FIRST DISPLAY ALL ITEMS AVAILABLE FOR SALE
         //  INCLUDING ID'S NAMES AND PRICES
