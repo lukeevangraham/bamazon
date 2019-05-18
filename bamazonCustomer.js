@@ -79,7 +79,33 @@ function runSearch() {
                     console.log("you can purchase that");
                     // UPDATE SQL DATABASE TO REFLECT REMAINING QUANTITY
                     var newStockQuantity = results[0].stock_quantity - answer.quantityDesired;
-                    console.log("new quantity is" + newStockQuantity);
+                    console.log(newStockQuantity)
+                    console.log(answer.idDesired);
+
+                    // var query2 = `UPDATE products SET stock_quantity = ` + answer.idDesired + `, WHERE item_id = ` + answer.idDesired `;`
+
+                    // console.log(query2);
+
+                    connection.query('UPDATE products SET stock_quantity = ? WHERE item_id = ?', [newStockQuantity, answer.idDesired], function(error, results, fields) {
+                        if (error) throw error;
+                    });
+
+                    // connection.query(query2, 
+                        
+                    //     // "UPDATE products SET ? WHERE ?",
+                    //     // [
+                    //     //     {
+                    //     //         stock_quantity: newStockQuantity
+                    //     //     },
+                    //     //     {
+                    //     //         id: answer.idDesired
+                    //     //     }
+                    //     // ],
+                    //     function(error) {
+                    //         if (error) throw err;
+                    //         console.log("Order going through\n");
+                    //     }
+                    // )
 
                 
 
