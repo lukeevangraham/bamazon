@@ -162,7 +162,7 @@ function getNewItem() {
 
 function completeItemCreation(err) {
     if (err) throw err;
-    console.log("\nYour auction was created successfully!\n");
+    console.log("\nYour item was added successfully!\n");
     // re-prompt the user for if they want to bid or post
     start();
   }
