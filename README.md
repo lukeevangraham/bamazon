@@ -2,6 +2,10 @@
 
 # Features Node.js & MySQL
 
+Usage demonstration found at this video link:  https://www.youtube.com/watch?v=dqKEz1knSqU
+
+
+
 
 ## Instructions
 
@@ -41,7 +45,7 @@
    * Once the update goes through, show the customer the total cost of their purchase.
 
 
-   
+
 
 ### Challenge #2: Manager View (Next Level)
 
