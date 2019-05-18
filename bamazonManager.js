@@ -38,16 +38,15 @@ function callNextActionOrExit(answer) {
     if (answer.userSelection === "View Products for Sale") {
         console.log("You want to view products");
         viewProducts();
-    }
-    else if (answer.userSelection === "View Low Inventory") {
+    } else if (answer.userSelection === "View Low Inventory") {
         console.log("You want to view inventory")
         viewLowInventory();
     } else if (answer.userSelection === "Add to Inventory") {
         console.log("You want to add to inventory")
-          addToInventory();
+        addToInventory();
     } else if (answer.userSelection === "Add New Product") {
-        //   bidAction();
         console.log("You want to add a new product")
+        getNewItem();
     } else {
         database.endConnection();
     }
@@ -64,6 +63,7 @@ function viewProducts() {
     })
     start();
 }
+
 // VIEW LOW INVENTORY LISTS ALL ITEMS WITH AN INVENTORY COUNT LOWER THAN FIVE
 function viewLowInventory() {
     connection.query("SELECT * FROM bamazon.products WHERE stock_quantity < 5", function (err, res) {
@@ -79,118 +79,98 @@ function viewLowInventory() {
 // ADD TO INVENTORY DISPLAYS A PROMPT THAT LETS MANAGER ADD MORE OF ANY ITEM CURRENTLY IN STORE
 function addToInventory() {
     inquirer
-    .prompt([
-        {
-            type: "input",
-            message: "Enter the Item ID of the product you want to add more of: ",
-            name: "desiredItemToAddInventory"
-        },
-    ])
-    .then(function(answer) {
-        connection.query("SELECT * FROM bamazon.products WHERE item_id = ?", [answer.desiredItemToAddInventory], function (err, res) {
-            if (err) throw err;
+        .prompt([
+            {
+                type: "input",
+                message: "Enter the Item ID of the product you want to add more of: ",
+                name: "desiredItemToAddInventory"
+            },
+        ])
+        .then(function (answer) {
+            connection.query("SELECT * FROM bamazon.products WHERE item_id = ?", [answer.desiredItemToAddInventory], function (err, res) {
+                if (err) throw err;
 
-            var newStockQuantity = res[0].stock_quantity + 10;
+                var newStockQuantity = res[0].stock_quantity + 10;
 
-            connection.query('UPDATE products SET stock_quantity = ? WHERE item_id = ?', [newStockQuantity, answer.desiredItemToAddInventory], function (error, results, fields) {
-                if (error) throw error;
-                console.log("\nInventory added!\n")
-                start();
-            });
+                connection.query('UPDATE products SET stock_quantity = ? WHERE item_id = ?', [newStockQuantity, answer.desiredItemToAddInventory], function (error, results, fields) {
+                    if (error) throw error;
+                    console.log("\nInventory added!\n")
+                    start();
+                });
+            })
         })
-    })
 }
 
 
 // ADD NEW PRODUCT ALLOWS MANGER TO ADD A COMPLETELY NEW PRODUCT TO STORE
-
-connection.connect(function (err) {
-    if (err) throw err;
-    console.log("connected as id " + connection.threadId);
-    // getStartMenuSelection()
-    // .then(callNextActionOrExit)
-    start();
-});
-
-
-function displayTable() {
-    connection.query("SELECT * FROM bamazon.products", function (err, res) {
-        if (err) throw err;
-
-        //  FIRST DISPLAY ALL ITEMS AVAILABLE FOR SALE
-        //  INCLUDING ID'S NAMES AND PRICES
-        for (let i = 0; i < res.length; i++) {
-            console.log("ID: " + res[i].item_id + " ---- Product: " + res[i].product_name + " ---- Price: $" + res[i].price)
-        }
-        runSearch();
-    });
+function addNewItem(params) {
+    getNewItem()
+        .then(saveNewItem)
 }
 
-//  THEN PROMPT USER WITH TWO MESSAGES
-
-function runSearch() {
-    //  ASK USER THE ID OF THE PRODUCT THEY WOULD LIKE TO BUY
-    inquirer
+// PROMPT FOR NEW ITEM INFO
+function getNewItem() {
+    return inquirer
         .prompt([
             {
                 type: "input",
-                message: "Enter ID of product you want to buy: ",
-                name: "idDesired"
+                message: "What is the product you would like to add?",
+                name: "product"
             },
-            //  ASK USER HOW MANY UNITS OF THE PRODUCT THEY WOULD LIKE TO BUY
             {
                 type: "input",
-                message: "How many units of the product would you like to buy? ",
-                name: "quantityDesired"
+                message: "What department would you like to place your item in?",
+                name: "department"
+            },
+            {
+                type: "input",
+                message: "What is the unit price of this item?",
+                name: "price",
+                validate: function (value) {
+                    if (isNaN(value) === false) {
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                type: "input",
+                message: "How many units do you want to add?",
+                name: "units",
+                validate: function (value) {
+                    if (isNaN(value) === false) {
+                        return true;
+                    }
+                    return false;
+                }
             }
         ])
-        .then(function (answer) {
-
-            // GET INFO FROM MYSQL ABOUT DESIRED ITEM
-            var query = "SELECT * FROM bamazon.products WHERE item_id = '" + answer.idDesired + "'";
-
-            connection.query(query, { item_id: answer.idDesired }, function (err, results, fields) {
-
-                if (err) throw err;
-
-                // IF INVENTORY CAN SUPPORT DESIRED QUANTITY
-
-                if (results[0].stock_quantity >= answer.quantityDesired) {
-
-                    // UPDATE SQL DATABASE TO REFLECT REMAINING QUANTITY
-                    var newStockQuantity = results[0].stock_quantity - answer.quantityDesired;
-
-                    connection.query('UPDATE products SET stock_quantity = ? WHERE item_id = ?', [newStockQuantity, answer.idDesired], function (error, results, fields) {
-                        if (error) throw error;
-                    });
-
-                    // SHOW CUSTOMER TOTAL COST OF PURCHASE
-                    var totalCost = results[0].price * answer.quantityDesired;
-                    console.log(`\n\nOrder fulfilled!\n\nYour total is: $` + totalCost + `\n\n`);
-
-                    connection.end();
-
-                    // ELSE TELL CUSTOME "WE DON'T HAVE ENOUGH"
-                } else {
-                    console.log("Insufficient quantity!");
-                    runSearch();
-                }
-            });
+        .then(function(newItem) {
+            connection.query(
+                "INSERT INTO products SET ?",
+                {
+                    product_name: newItem.product,
+                    department_name: newItem.department,
+                    price: newItem.price || 0,
+                    stock_quantity: newItem.units || 0
+                },
+                completeItemCreation
+            );
         })
 }
 
 
+function completeItemCreation(err) {
+    if (err) throw err;
+    console.log("\nYour auction was created successfully!\n");
+    // re-prompt the user for if they want to bid or post
+    start();
+  }
 
+connection.connect(function (err) {
+    if (err) throw err;
+    console.log("connected as id " + connection.threadId);
 
-
-
-//  CHECK THAT STORE HAS ENOUGH PRODUCE FOR USER REQUEST
-
-//  IF NOT STATE "INSUFFICIENT QUANTITY!" AND STOP ORDER
-
-//  IF PRODUCT IS AVAILABLE FULFILL ORDER
-
-// UPDATE SQL DATABASE TO REFLECT REMAINING QUANTITY
-
-// SHOW USER TOTAL PURCHASE COST
+    start();
+});
 
