@@ -43,8 +43,8 @@ function callNextActionOrExit(answer) {
         console.log("You want to view inventory")
         viewLowInventory();
     } else if (answer.userSelection === "Add to Inventory") {
-        //   bidAction();
         console.log("You want to add to inventory")
+          addToInventory();
     } else if (answer.userSelection === "Add New Product") {
         //   bidAction();
         console.log("You want to add a new product")
@@ -77,6 +77,30 @@ function viewLowInventory() {
 }
 
 // ADD TO INVENTORY DISPLAYS A PROMPT THAT LETS MANAGER ADD MORE OF ANY ITEM CURRENTLY IN STORE
+function addToInventory() {
+    inquirer
+    .prompt([
+        {
+            type: "input",
+            message: "Enter the Item ID of the product you want to add more of: ",
+            name: "desiredItemToAddInventory"
+        },
+    ])
+    .then(function(answer) {
+        connection.query("SELECT * FROM bamazon.products WHERE item_id = ?", [answer.desiredItemToAddInventory], function (err, res) {
+            if (err) throw err;
+
+            var newStockQuantity = res[0].stock_quantity + 10;
+
+            connection.query('UPDATE products SET stock_quantity = ? WHERE item_id = ?', [newStockQuantity, answer.desiredItemToAddInventory], function (error, results, fields) {
+                if (error) throw error;
+                console.log("\nInventory added!\n")
+                start();
+            });
+        })
+    })
+}
+
 
 // ADD NEW PRODUCT ALLOWS MANGER TO ADD A COMPLETELY NEW PRODUCT TO STORE
 
