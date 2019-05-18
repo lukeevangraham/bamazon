@@ -15,6 +15,11 @@ var connection = mysql.createConnection({
     database: "bamazon"
 });
 
+function start() {
+    getStartMenuSelection()
+        .then(callNextActionOrExit);
+}
+
 // LIST A SET OF MENU OPTIONS
 function getStartMenuSelection() {
     return inquirer
@@ -28,14 +33,15 @@ function getStartMenuSelection() {
         ])
 }
 
+// FUNCTION RESPONDING TO USER INPUT
 function callNextActionOrExit(answer) {
     if (answer.userSelection === "View Products for Sale") {
-        //   postAuction();
         console.log("You want to view products");
+        viewProducts();
     }
     else if (answer.userSelection === "View Low Inventory") {
-        //   bidAction();
         console.log("You want to view inventory")
+        viewLowInventory();
     } else if (answer.userSelection === "Add to Inventory") {
         //   bidAction();
         console.log("You want to add to inventory")
@@ -47,11 +53,39 @@ function callNextActionOrExit(answer) {
     }
 }
 
+// VIEW PRODUCT FUNCTION LISTS EVERY AVAILABLE ITEM (IDs, names, prices, quantities)
+function viewProducts() {
+    connection.query("SELECT * FROM bamazon.products", function (err, res) {
+        if (err) throw err;
+        console.log("\n")
+        for (let i = 0; i < res.length; i++) {
+            console.log("ID: " + res[i].item_id + " ---- Product: " + res[i].product_name + " ---- Price: $" + res[i].price + " ---- Quantity: " + res[i].stock_quantity)
+        }
+    })
+    start();
+}
+// VIEW LOW INVENTORY LISTS ALL ITEMS WITH AN INVENTORY COUNT LOWER THAN FIVE
+function viewLowInventory() {
+    connection.query("SELECT * FROM bamazon.products WHERE stock_quantity < 5", function (err, res) {
+        if (err) throw err;
+        console.log(`\n`)
+        for (let i = 0; i < res.length; i++) {
+            console.log("ID: " + res[i].item_id + " ---- Product: " + res[i].product_name + " ---- Price: $" + res[i].price + " ---- Quantity: " + res[i].stock_quantity)
+        }
+    })
+    start();
+}
+
+// ADD TO INVENTORY DISPLAYS A PROMPT THAT LETS MANAGER ADD MORE OF ANY ITEM CURRENTLY IN STORE
+
+// ADD NEW PRODUCT ALLOWS MANGER TO ADD A COMPLETELY NEW PRODUCT TO STORE
+
 connection.connect(function (err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId);
-    getStartMenuSelection()
-        .then(callNextActionOrExit)
+    // getStartMenuSelection()
+    // .then(callNextActionOrExit)
+    start();
 });
 
 
