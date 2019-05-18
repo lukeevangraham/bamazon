@@ -72,10 +72,18 @@ function runSearch() {
                 if (err) throw err;
 
                 console.log(results[0].stock_quantity)
+                console.log(results[0])
 
 
                 if (results[0].stock_quantity >= answer.quantityDesired) {
                     console.log("you can purchase that");
+                    // UPDATE SQL DATABASE TO REFLECT REMAINING QUANTITY
+                    var newStockQuantity = results[0].stock_quantity - answer.quantityDesired;
+                    console.log("new quantity is" + newStockQuantity);
+
+                
+
+                    // SHOW CUSTOMER TOTAL COST OF PURCHASE
                     connection.end();
                 } else {
                     console.log("Insufficient quantity!");
