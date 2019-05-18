@@ -26,8 +26,6 @@ function displayTable() {
     connection.query("SELECT * FROM bamazon.products", function (err, res) {
         if (err) throw err;
 
-        // console.log(res)
-
         //  FIRST DISPLAY ALL ITEMS AVAILABLE FOR SALE
         //  INCLUDING ID'S NAMES AND PRICES
         for (let i = 0; i < res.length; i++) {
@@ -57,72 +55,38 @@ function runSearch() {
         ])
         .then(function (answer) {
 
+            // GET INFO FROM MYSQL ABOUT DESIRED ITEM
+            var query = "SELECT * FROM bamazon.products WHERE item_id = '" + answer.idDesired + "'";
 
-            console.log(answer);
-            // var query = "SELECT stock_quantity FROM bamazon.products WHERE item_id = ?";
-            var query = "SELECT stock_quantity FROM bamazon.products WHERE item_id = '" + answer.idDesired + "'";
-
-
-            // console.log("the query is" + query)
-            console.log(answer.idDesired);
-
-            // connection.query('SELECT * FROM bamazon.products WHERE item_id = "1"', function (err, results, fields) {
-            connection.query(query, {item_id: answer.idDesired}, function (err, results, fields) {
+            connection.query(query, { item_id: answer.idDesired }, function (err, results, fields) {
 
                 if (err) throw err;
 
-                console.log(results[0].stock_quantity)
-                console.log(results[0])
-
+                // IF INVENTORY CAN SUPPORT DESIRED QUANTITY
 
                 if (results[0].stock_quantity >= answer.quantityDesired) {
-                    console.log("you can purchase that");
+
                     // UPDATE SQL DATABASE TO REFLECT REMAINING QUANTITY
                     var newStockQuantity = results[0].stock_quantity - answer.quantityDesired;
-                    console.log(newStockQuantity)
-                    console.log(answer.idDesired);
-
-                    // var query2 = `UPDATE products SET stock_quantity = ` + answer.idDesired + `, WHERE item_id = ` + answer.idDesired `;`
-
-                    // console.log(query2);
-
-                    connection.query('UPDATE products SET stock_quantity = ? WHERE item_id = ?', [newStockQuantity, answer.idDesired], function(error, results, fields) {
+                    
+                    connection.query('UPDATE products SET stock_quantity = ? WHERE item_id = ?', [newStockQuantity, answer.idDesired], function (error, results, fields) {
                         if (error) throw error;
                     });
-
-                    // connection.query(query2, 
-                        
-                    //     // "UPDATE products SET ? WHERE ?",
-                    //     // [
-                    //     //     {
-                    //     //         stock_quantity: newStockQuantity
-                    //     //     },
-                    //     //     {
-                    //     //         id: answer.idDesired
-                    //     //     }
-                    //     // ],
-                    //     function(error) {
-                    //         if (error) throw err;
-                    //         console.log("Order going through\n");
-                    //     }
-                    // )
-
-                
-
+                    
                     // SHOW CUSTOMER TOTAL COST OF PURCHASE
+                    var totalCost = results[0].price * answer.quantityDesired;
+                    console.log(`\n\nOrder fulfilled!\n\nYour total is: $` + totalCost + `\n\n`);
+
                     connection.end();
+
+                // ELSE TELL CUSTOME "WE DON'T HAVE ENOUGH"
                 } else {
                     console.log("Insufficient quantity!");
                     runSearch();
                 }
-              });
-
-            // console.log(quantityAvailable)
-            // if (answer.idDesired > ) {
-
-            // }
+            });
         })
-    }
+}
 
 
 
