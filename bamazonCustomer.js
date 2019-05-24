@@ -62,7 +62,7 @@ function runSearch() {
 
                 if (err) throw err;
 
-                // IF INVENTORY CAN SUPPORT DESIRED QUANTITY
+                //  CHECK THAT STORE HAS ENOUGH PRODUCT FOR USER REQUEST
 
                 if (results[0].stock_quantity >= answer.quantityDesired) {
 
@@ -87,19 +87,4 @@ function runSearch() {
             });
         })
 }
-
-
-
-
-
-
-//  CHECK THAT STORE HAS ENOUGH PRODUCE FOR USER REQUEST
-
-//  IF NOT STATE "INSUFFICIENT QUANTITY!" AND STOP ORDER
-
-//  IF PRODUCT IS AVAILABLE FULFILL ORDER
-
-// UPDATE SQL DATABASE TO REFLECT REMAINING QUANTITY
-
-// SHOW USER TOTAL PURCHASE COST
 
