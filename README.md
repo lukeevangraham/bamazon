@@ -1,8 +1,45 @@
 # bamazon
 
-# Features Node.js & MySQL
+## Overview
 
 Usage demonstration found at this video link:  https://www.youtube.com/watch?v=dqKEz1knSqU
+
+## Installing
+
+To run the app locally, you will first need to git clone the repository to your local machine.
+
+HTTPS:
+
+$ git clone https://github.com/lukeevangraham/bamazon.git
+
+SSH:
+
+$ git clone git@github.com:lukeevangraham/bamazon.git
+Once cloned, cd into the repository and install the necessary dependencies by running:
+
+$ npm install
+You can then run the app in the customer view by running:
+
+$ node bamazonCustomer.js
+
+## Using the app
+
+### Customer View:
+Luanch the customer view by typing
+$ node bamazonCustomer
+
+This application first displays all of the items available for sale including the ids, names, and prices of products for sale.
+
+Then the user is prompted with two message:
+   * The first asks them the ID of the product they would like to buy.
+   * The second message asks how many units of the product they would like to buy.
+   
+After the user has places the order, the application checks if the store has enough of the product to meet the customer's request.
+
+   * If not, the app displays the phrase `Insufficient quantity!`, and prevents the order from going through.
+
+* However, if the store _does_ have enough of the product, the app fulfills the customer's order.
+   * This updates the SQL database to reflect the remaining quantity and shows the customer the total cost of their purchase.
 
 
 
