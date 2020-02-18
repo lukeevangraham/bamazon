@@ -62,16 +62,26 @@ function runSearch() {
 
                 if (err) throw err;
 
+                console.log("LOOK HERE: ", results)
+
                 //  CHECK THAT STORE HAS ENOUGH PRODUCT FOR USER REQUEST
 
                 if (results[0].stock_quantity >= answer.quantityDesired) {
 
                     // UPDATE SQL DATABASE TO REFLECT REMAINING QUANTITY
                     var newStockQuantity = results[0].stock_quantity - answer.quantityDesired;
+
+                    let newProductSales = ((results[0].price * answer.quantityDesired) + results[0].product_sales)
+
+                    console.log("NEW SALES: ", newProductSales)
                     
                     connection.query('UPDATE products SET stock_quantity = ? WHERE item_id = ?', [newStockQuantity, answer.idDesired], function (error, results, fields) {
                         if (error) throw error;
                     });
+
+                    connection.query('UPDATE products SET product_sales = ? WHERE item_id = ?', [newProductSales, answer.idDesired], function (error, results, fields) {
+                        if (error) throw error;
+                    })
                     
                     // SHOW CUSTOMER TOTAL COST OF PURCHASE
                     var totalCost = results[0].price * answer.quantityDesired;

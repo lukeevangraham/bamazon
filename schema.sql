@@ -12,6 +12,13 @@ CREATE TABLE products (
     PRIMARY KEY (item_id)
 );
 
+CREATE TABLE departments (
+    department_id BIGINT AUTO_INCREMENT,
+    department_name VARCHAR(200),
+    over_head_costs INTEGER,
+    PRIMARY KEY (department_id)
+)
+
 INSERT INTO products (product_name, department_name, price, stock_quantity)
 VALUES ("Captain Crunch","Food",4,40);
 
