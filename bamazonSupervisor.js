@@ -44,59 +44,62 @@ function callNextActionOrExit(answer) {
 }
 
 function viewProductsByDepartment() {
-  let query =
-    "SELECT department_name, SUM(product_sales) AS product_sales FROM products GROUP BY department_name;";
-  let newProductList = [];
+    // let query = "SELECT department_name, SUM(product_sales - over_head_costs) AS total_profit FROM products INNER JOIN departments USING (department_name) GROUP BY department_name;"
+    // let query = "SELECT department_name, SUM(product_sales) AS product_sales FROM products GROUP BY department_name;";
+    let query = "SELECT p.department_name, SUM(d.over_head_costs) AS over_head_costs, p.product_sales, SUM(p.product_sales - d.over_head_costs) AS total_profit FROM products p RIGHT JOIN departments d ON p.department_name = d.department_name GROUP BY p.department_name, p.product_sales"
 
-  // let query = "SELECT products.department_name, departments.over_head_costs, products.product_sales";
-  // query += "FROM products INNER JOIN departments"
-
-  // let query = "SELECT products.department_name, SUM(products.product_sales - departments.over_head_costs) AS total_profit FROM products INNER JOIN departments GROUP BY department_name;"
-
-  connection.query(query, function(err, res) {
-    if (err) throw err;
-    // console.log(res);
-
-    let i = 1;
-
-    res.forEach(product => {
-      let newProduct = {};
-      // newProduct.department_id = i;
-      newProduct.department_name = product.department_name;
-      newProduct.product_sales = product.product_sales;
-      // console.log(newProduct);
-      newProductList.push(newProduct);
-      i++;
-    });
-    console.log(newProductList);
-
-    // query database for existing departments in departments table
-    query = "SELECT * FROM departments";
-    let departmentList;
+    let newProductList
 
     connection.query(query, function(err, res) {
-      if (err) throw err;
+        if (err) throw err;
 
-        newProductList.forEach(product => {
-            let productMatch = false;
-            res.forEach(department => {
-                if (product.department_name === department.department_name) {
-                    productMatch = true;
-                }
-            });
-            if (productMatch === false) {
-                        connection.query(
-                "INSERT INTO departments SET ?",
-                {
-                    department_name: product.department_name
-                },
-            );
+        console.table(res);
+
+    })
+
+    // THE FOLLOWING CODE BROUGHT OVER ALL DEPARTMENT NAMES TO THE DEPARTMENTS TABLE
+//   let query =
+//     "SELECT department_name, SUM(product_sales) AS product_sales FROM products GROUP BY department_name;";
+//   let newProductList = [];
+
+//   connection.query(query, function(err, res) {
+//     if (err) throw err;
+
+//     res.forEach(product => {
+//       let newProduct = {};
+//       newProduct.department_name = product.department_name;
+//       newProduct.product_sales = product.product_sales;
+//       newProductList.push(newProduct);
+//     });
+//     console.log(newProductList);
+
+//     // query database for existing departments in departments table
+//     query = "SELECT * FROM departments";
+//     let departmentList;
+
+//     connection.query(query, function(err, res) {
+//       if (err) throw err;
+
+//         newProductList.forEach(product => {
+//             let productMatch = false;
+//             res.forEach(department => {
+//                 if (product.department_name === department.department_name) {
+//                     productMatch = true;
+//                 }
+//             });
+//             if (productMatch === false) {
+//                         connection.query(
+//                 "INSERT INTO departments SET ?",
+//                 {
+//                     department_name: product.department_name
+//                 },
+//             );
     
-            }
+//             }
             
-        });
-    });
-  });
+//         });
+//     });
+//   });
 }
 
 connection.connect(function(err) {
