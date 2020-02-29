@@ -15,6 +15,15 @@ var connection = mysql.createConnection({
   database: "bamazon"
 });
 
+function makeTable() {
+  connection.query("SELECT * FROM products;", function (err, res) {
+    if (err) throw err;
+    console.table(res);
+    start();
+  })
+  
+}
+
 function start() {
   getStartMenuSelection().then(callNextActionOrExit);
 }
@@ -36,19 +45,55 @@ function callNextActionOrExit(answer) {
     // console.log("You want to view products by department");
     viewProductsByDepartment();
   } else if (answer.userSelection === "Create New Department") {
-    console.log("You want to create a new department");
+    promptCreateDepartment().then(createDepartment);
     // viewLowInventory();
   } else {
     database.endConnection();
   }
 }
 
+function promptCreateDepartment() {
+  console.log("You want to create a new department");
+  return inquirer.prompt([
+    {
+      type: "input",
+      message: "Name of new department:",
+      name: "newDepartmentName"
+    },
+    {
+      type: "input",
+      message: "What are the new department's over head costs?",
+      name: "newDepartmentOverHeadCosts"
+    }
+  ])
+}
+
+function createDepartment(department) {
+  // console.log("creating: ", department)
+
+  let query = `"INSERT INTO departments SET ?",
+  {
+    department_name: department.newDepartmentName,
+    over_head_costs: department.newDepartmentOverHeadCosts
+  }`
+
+  connection.query("INSERT INTO departments SET ?",
+  {
+    department_name: department.newDepartmentName,
+    over_head_costs: department.newDepartmentOverHeadCosts
+  }, function(err) {
+    if (err) throw err;
+    console.log("SUCCESS!")
+    makeTable()
+  })
+
+}
+
 function viewProductsByDepartment() {
   // let query = "SELECT department_name, SUM(product_sales - over_head_costs) AS total_profit FROM products INNER JOIN departments USING (department_name) GROUP BY department_name;"
   // let query = "SELECT department_name, SUM(product_sales) AS product_sales FROM products GROUP BY department_name;";
-  let query = "SELECT p.department_name, SUM(IFNULL(p.product_sales, 0)) AS product_sales, d.over_head_costs, ";
-  query += "SUM(IFNULL(p.product_sales, 0) - d.over_head_costs) AS total_profit FROM products p ";
-  query += "RIGHT JOIN departments d ON (p.department_name = d.department_name) GROUP BY department_name, d.over_head_costs";
+let query = "SELECT d.department_name, d.over_head_costs, SUM(IFNULL(p.product_sales, 0)) AS product_sales, SUM(IFNULL(p.product_sales, 0)) - d.over_head_costs AS total_profit ";
+query += "FROM products p RIGHT JOIN departments d ON(p.department_name = d.department_name) GROUP BY d.department_name, d.over_head_costs";
 
   let newProductList;
 
@@ -56,8 +101,11 @@ function viewProductsByDepartment() {
     if (err) throw err;
 
     console.table(res);
+    console.log("\n \n")
   });
 
+
+  start()
   // THE FOLLOWING CODE BROUGHT OVER ALL DEPARTMENT NAMES TO THE DEPARTMENTS TABLE
   //   let query =
   //     "SELECT department_name, SUM(product_sales) AS product_sales FROM products GROUP BY department_name;";
